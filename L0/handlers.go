@@ -25,8 +25,10 @@ func handlerHome(w http.ResponseWriter, r *http.Request) {
 }
 
 // тут метод гет
-func handlerView(w http.ResponseWriter, r *http.Request) {
-
+func (paket *info) handlerView(w http.ResponseWriter, r *http.Request) {
+	//stmt := `INSERT INTO snippets (title, content_, created, expires)
+	//	VALUES($1, $2, current_timestamp, current_timestamp + interval '1 year' * $3)`
+	//paket.db.Exec(stmt, "qwerty", "abc", "123")
 	myParam := r.URL.Query().Get("UID")
 
 	w.Write([]byte("You enter" + myParam))

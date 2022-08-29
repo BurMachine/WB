@@ -18,3 +18,8 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 	return db, nil
 }
+
+func existDB(id int, db *sql.DB) bool {
+
+	return true
+}

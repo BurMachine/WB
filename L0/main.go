@@ -1,23 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 )
 
 type info struct {
+	db *sql.DB
 }
 
 func main() {
 	dsn := "postgresql://web:123@127.0.0.1:5433/userdb?sslmode=disable"
-	_, err := openDB(dsn)
+	db, err := openDB(dsn)
 	if err != nil {
 		return
 	}
+	a := &info{
+		db: db,
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlerHome)
-	mux.HandleFunc("/uid/", handlerView)
+	mux.HandleFunc("/uid/", a.handlerView)
 
 	server := http.Server{
 		Addr:         ":8080",
