@@ -2,33 +2,22 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
 	"time"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	ts, err := template.ParseFiles("ui/static/home.page.tmpl")
-	if err != nil {
-		log.Println("template error:" + err.Error())
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
-	err = ts.Execute(w, nil)
-	if err != nil {
-		log.Println(err.Error() + "\nExecution error")
-		http.Error(w, "Internal Server Error", 500)
-	}
+type info struct {
 }
 
 func main() {
+	dsn := "postgresql://web:123@127.0.0.1:5433/userdb?sslmode=disable"
+	_, err := openDB(dsn)
+	if err != nil {
+		return
+	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handler)
+	mux.HandleFunc("/", handlerHome)
+	mux.HandleFunc("/uid/", handlerView)
 
 	server := http.Server{
 		Addr:         ":8080",
