@@ -19,7 +19,28 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func existDB(id int, db *sql.DB) bool {
+func existDB(uid string, db *sql.DB) (bool, error) {
+	var count int
+	row := db.QueryRow("SELECT EXISTS (SELECT * FROM json_table WHERE uid = $1);", uid)
+	err := row.Scan(&count)
+	if err != nil {
+		log.Println("exist check error", err)
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
 
-	return true
+func selectJSON(uid string, db *sql.DB) (error, string) {
+	var res string
+	rows, err := db.Query("select information from json_table where uid = $1", uid)
+	if err != nil {
+		log.Println("select error", err)
+		return err, "1"
+	}
+	defer rows.Close()
+	rows.Scan(&res)
+	return err, res
 }

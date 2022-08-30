@@ -30,6 +30,10 @@ func (paket *info) handlerView(w http.ResponseWriter, r *http.Request) {
 	//	VALUES($1, $2, current_timestamp, current_timestamp + interval '1 year' * $3)`
 	//paket.db.Exec(stmt, "qwerty", "abc", "123")
 	myParam := r.URL.Query().Get("UID")
+	if a, _ := existDB(myParam, paket.db); a {
+		_, text := selectJSON(myParam, paket.db)
 
+		w.Write([]byte(text))
+	}
 	w.Write([]byte("You enter" + myParam))
 }
