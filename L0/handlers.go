@@ -26,14 +26,17 @@ func handlerHome(w http.ResponseWriter, r *http.Request) {
 
 // тут метод гет
 func (paket *info) handlerView(w http.ResponseWriter, r *http.Request) {
-	//stmt := `INSERT INTO snippets (title, content_, created, expires)
-	//	VALUES($1, $2, current_timestamp, current_timestamp + interval '1 year' * $3)`
-	//paket.db.Exec(stmt, "qwerty", "abc", "123")
+	// stmt := `INSERT INTO snippets (title, content_, created, expires)
+	// VALUES($1, $2, current_timestamp, current_timestamp + interval '1 year' * $3)`
+	// paket.db.Exec(stmt, "qwerty", "abc", "123")
 	myParam := r.URL.Query().Get("UID")
 	if a, _ := existDB(myParam, paket.db); a {
 		_, text := selectJSON(myParam, paket.db)
-
+		log.Println(text)
 		w.Write([]byte(text))
+		w.Write([]byte("hello"))
+	} else {
+		log.Println("нет такой", myParam)
+		w.Write([]byte("You enter" + myParam))
 	}
-	w.Write([]byte("You enter" + myParam))
 }

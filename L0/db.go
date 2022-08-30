@@ -21,7 +21,8 @@ func openDB(dsn string) (*sql.DB, error) {
 
 func existDB(uid string, db *sql.DB) (bool, error) {
 	var count int
-	row := db.QueryRow("SELECT EXISTS (SELECT * FROM json_table WHERE uid = $1);", uid)
+	//row := db.QueryRow("SELECT EXISTS (SELECT * FROM json_table WHERE uid = $1);", uid)
+	row := db.QueryRow("SELECT COUNT (DISTINCT uid) FROM json_table WHERE uid = $1;", uid)
 	err := row.Scan(&count)
 	if err != nil {
 		log.Println("exist check error", err)
@@ -41,6 +42,15 @@ func selectJSON(uid string, db *sql.DB) (error, string) {
 		return err, "1"
 	}
 	defer rows.Close()
-	rows.Scan(&res)
+	result := make([]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(&res)
+		if err != nil {
+			log.Println("не получилось просканить поле с json", err)
+		}
+		result = append(result, res)
+	}
+	resByte := []byte(res)
+	log.Println(resByte)
 	return err, res
 }
