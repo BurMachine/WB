@@ -1,6 +1,6 @@
-package main
+package models
 
-type model struct {
+type Model struct {
 	Order_uid               string   `json:"order_uid"`
 	Track_number            string   `json:"track_number"`
 	Entry                   string   `json:"entry"`
