@@ -53,3 +53,28 @@ func selectJSON(uid string, db *sql.DB) (error, string) {
 	//resByte := []byte(res)
 	return err, res
 }
+
+func insertDB(str string, uid string, db *sql.DB) error {
+	if check, _ := existDB(uid, db); !check {
+		stmt := `INSERT INTO json_table (uid, information) VALUES ($1, $2);`
+		if _, err := db.Exec(stmt, uid, str); err != nil {
+			log.Println("insert info error", err)
+		}
+	} else {
+		log.Println("elem exist(insert is impossible)")
+	}
+	return nil
+}
+
+func mapDB(db *sql.DB) map[string]string {
+	var chtot1, chtot2 string
+	row := db.QueryRow(`SELECT * FROM json_table;`)
+	err := row.Scan(&chtot1, &chtot2)
+	if err != nil {
+		log.Println("select map error", err)
+	}
+	//fmt.Println(chtot1, chtot2)
+	m := make(map[string]string)
+	m[chtot1] = chtot2
+	return m
+}

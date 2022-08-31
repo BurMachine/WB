@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/nats-io/stan.go"
+	"log"
 	"net/http"
 	"time"
 )
@@ -24,6 +26,22 @@ func main() {
 	mux.HandleFunc("/", handlerHome)
 	mux.HandleFunc("/uid/", a.handlerView)
 
+	// nuts-streaming connection
+	sc, err := stan.Connect("test-cluster", "consumer")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = sc.Subscribe("foo", func(m *stan.Msg) {
+		//fmt.Printf("Received a message: %s\n", string(m.Data))
+		str, _ := separate(m.Data)
+		insertDB(string(m.Data), str, db)
+		log.Println(str)
+	})
+	m := mapDB(db)
+	fmt.Println(m)
+	if err != nil {
+		fmt.Println(err)
+	}
 	server := http.Server{
 		Addr:         ":8080",
 		Handler:      mux,
