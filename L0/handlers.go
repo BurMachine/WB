@@ -32,9 +32,7 @@ func (paket *info) handlerView(w http.ResponseWriter, r *http.Request) {
 	myParam := r.URL.Query().Get("UID")
 	if a, _ := existDB(myParam, paket.db); a {
 		_, text := selectJSON(myParam, paket.db)
-		log.Println(text)
 		w.Write([]byte(text))
-		w.Write([]byte("hello"))
 	} else {
 		log.Println("нет такой", myParam)
 		w.Write([]byte("You enter" + myParam))

@@ -50,7 +50,6 @@ func selectJSON(uid string, db *sql.DB) (error, string) {
 		}
 		result = append(result, res)
 	}
-	resByte := []byte(res)
-	log.Println(resByte)
+	//resByte := []byte(res)
 	return err, res
 }
