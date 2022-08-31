@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	modelList := []string{"../model.json", "../model1.json"}
+	modelList := []string{"../model.json", "../model1.json", "../model3.json"}
 	sc, err := stan.Connect("test-cluster", "publisher")
 	if err != nil {
 		fmt.Println(err)

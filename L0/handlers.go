@@ -31,10 +31,11 @@ func (paket *info) handlerView(w http.ResponseWriter, r *http.Request) {
 	// paket.db.Exec(stmt, "qwerty", "abc", "123")
 	myParam := r.URL.Query().Get("UID")
 	if a, _ := existDB(myParam, paket.db); a {
-		_, text := selectJSON(myParam, paket.db)
+		//_, text := selectJSON(myParam, paket.db)
+		text := paket.ma[myParam]
 		w.Write([]byte(text))
 	} else {
-		log.Println("нет такой", myParam)
-		w.Write([]byte("You enter" + myParam))
+		log.Println("Нет такой", myParam)
+		w.Write([]byte("No such uid exists" + myParam))
 	}
 }

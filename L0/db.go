@@ -59,7 +59,9 @@ func insertDB(str string, uid string, db *sql.DB) error {
 		stmt := `INSERT INTO json_table (uid, information) VALUES ($1, $2);`
 		if _, err := db.Exec(stmt, uid, str); err != nil {
 			log.Println("insert info error", err)
+			return err
 		}
+		log.Println("Add json with uid: ", str)
 	} else {
 		log.Println("elem exist(insert is impossible)")
 	}
@@ -68,13 +70,20 @@ func insertDB(str string, uid string, db *sql.DB) error {
 
 func mapDB(db *sql.DB) map[string]string {
 	var chtot1, chtot2 string
-	row := db.QueryRow(`SELECT * FROM json_table;`)
-	err := row.Scan(&chtot1, &chtot2)
-	if err != nil {
-		log.Println("select map error", err)
-	}
-	//fmt.Println(chtot1, chtot2)
 	m := make(map[string]string)
-	m[chtot1] = chtot2
+	rows, err := db.Query("SELECT * FROM json_table;")
+	//row := db.QueryRow(`SELECT * FROM json_table;`)
+	//err := row.Scan(&chtot1, &chtot2)
+	for rows.Next() {
+		if err = rows.Scan(&chtot1, &chtot2); err != nil {
+			log.Println("select map error", err)
+			return nil
+		}
+		m[chtot1] = chtot2
+	}
+
+	//fmt.Println(chtot1, chtot2)
+	//m := make(map[string]string)
+	//m[chtot1] = chtot2
 	return m
 }

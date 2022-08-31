@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/nats-io/stan.go"
-	"log"
 	"net/http"
 	"time"
 )
 
 type info struct {
 	db *sql.DB
+	ma map[string]string
 }
 
 func main() {
@@ -19,12 +19,15 @@ func main() {
 	if err != nil {
 		return
 	}
+	ma := mapDB(db)
 	a := &info{
 		db: db,
+		ma: ma,
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlerHome)
 	mux.HandleFunc("/uid/", a.handlerView)
+	// кеш начальный
 
 	// nuts-streaming connection
 	sc, err := stan.Connect("test-cluster", "consumer")
@@ -35,10 +38,9 @@ func main() {
 		//fmt.Printf("Received a message: %s\n", string(m.Data))
 		str, _ := separate(m.Data)
 		insertDB(string(m.Data), str, db)
-		log.Println(str)
+
+		ma = mapDB(db)
 	})
-	m := mapDB(db)
-	fmt.Println(m)
 	if err != nil {
 		fmt.Println(err)
 	}
