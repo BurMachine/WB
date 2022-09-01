@@ -13,6 +13,5 @@ func separate(str []byte) (string, error) {
 		log.Println("json unmarshalling error int helper function", err)
 		return "", err
 	}
-	//fmt.Println(mod)
-	return string(mod.Order_uid), nil
+	return mod.Order_uid, nil
 }

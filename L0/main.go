@@ -35,10 +35,8 @@ func main() {
 		fmt.Println(err)
 	}
 	_, err = sc.Subscribe("foo", func(m *stan.Msg) {
-		//fmt.Printf("Received a message: %s\n", string(m.Data))
 		str, _ := separate(m.Data)
 		insertDB(string(m.Data), str, db)
-
 		ma = mapDB(db)
 	})
 	if err != nil {

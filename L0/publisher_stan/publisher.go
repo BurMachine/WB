@@ -10,16 +10,12 @@ import (
 )
 
 func main() {
-	modelList := []string{"../model.json", "../model1.json", "../model3.json"}
+	modelList := []string{"../model.json", "../model1.json", "../model3.json", "../model_err.json"}
 	sc, err := stan.Connect("test-cluster", "publisher")
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer sc.Close()
-	//for i := 0; i < 100; i++ {
-	//	sc.Publish("foo", []byte("Здарова"))
-	//	time.Sleep(100 * time.Millisecond)
-	//}
 	mod := new(models.Model)
 	sliceMod := make([]models.Model, 0)
 	for _, s := range modelList {
@@ -27,10 +23,15 @@ func main() {
 		if err != nil {
 			log.Println("file is not opened", err)
 		}
-		json.Unmarshal(file, mod)
+		err = json.Unmarshal(file, mod)
+		if err != nil {
+			log.Println("Publisher: input error", err)
+			continue
+		}
 		sliceMod = append(sliceMod, *mod)
-		sc.Publish("foo", file)
-		//log.Println(mod)
+		err = sc.Publish("foo", file)
+		if err != nil {
+			log.Println("Publisher: sc.Publish() function error\n", err)
+		}
 	}
-
 }
