@@ -11,16 +11,10 @@ type arrStruct struct {
 	mu  sync.Mutex
 }
 
-//func pow(number int) {
-//	fmt.Printf("%d\n", number*number)
-//}
-
 func (s *arrStruct) pow(i int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.arr[i] *= s.arr[i]
-	//fmt.Printf("%d\n", s.arr)
-	//s.mu.Unlock()
 }
 
 func main() {

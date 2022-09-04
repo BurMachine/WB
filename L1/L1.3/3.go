@@ -11,28 +11,31 @@ type arrStruct struct {
 	mu  sync.Mutex
 }
 
-func (s *arrStruct) pow(i int) {
+func (s *arrStruct) pow(i int, wg *sync.WaitGroup) {
+	// закрываю и откладываю открытие мьютекса
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	defer wg.Done() // уменьшаю waitgroup
 	s.arr[i] *= s.arr[i]
 	s.res += s.arr[i]
-	fmt.Println(s.res)
 }
 
 func main() {
 	arr := []int{2, 4, 6, 8, 10}
 	res := 0
-	//var wg sync.WaitGroup
+	var wg sync.WaitGroup
 	var mu sync.Mutex
 	s := &arrStruct{
 		arr: arr,
 		mu:  mu,
 		res: res,
 	}
-	//wg.Add(len(s.arr))
+	a := len(s.arr)
+	wg.Add(a)
+	// разделяю на горутины
 	for i := 0; i < len(s.arr); i++ {
-		go s.pow(i)
+		go s.pow(i, &wg)
 	}
-	//wg.Wait()
-	//fmt.Println(s.res)
+	wg.Wait() // жду waitgroup(main)
+	fmt.Println(s.res)
 }
