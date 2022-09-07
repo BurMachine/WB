@@ -19,12 +19,16 @@ func (w *workers) work(id int, wg *sync.WaitGroup) {
 	log.Println(id, "Ready")
 	defer wg.Done()
 	for {
+		time.Sleep(100 * time.Millisecond)
 		select {
-		case v := <-w.Channel:
+		case v, ok := <-w.Channel:
+			if !ok {
+				continue
+			}
 			log.Println(v, "worker", id)
 		case <-w.ExitChannel:
-			if a, ok := <-w.Channel; ok {
-				log.Println(a, "worker", id)
+			for i := range w.Channel {
+				log.Println(i, "worker", id)
 			}
 			log.Println("exit", id)
 			return
@@ -37,40 +41,39 @@ func main() {
 	fmt.Println("Set worker's count:")
 	fmt.Scanln(&count)
 	fmt.Println("Workers:\n")
-	ch := make(chan interface{}, 10)
+	ch := make(chan interface{}, 100)
 	exChan := make(chan struct{})
 	// os.Signal
 	signalCh := make(chan os.Signal)
 	signal.Notify(signalCh, os.Interrupt, os.Kill)
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	// workers
 	n := make([]workers, count)
 	for i := 0; i < count; i++ {
 		n[i] = workers{Channel: ch, ExitChannel: exChan}
 		wg.Add(1)
-		go n[i].work(i, &wg)
+		go n[i].work(i, wg)
 	}
-	//for i := 0; i < count; i++ {
-	//	go n[i].work(i)
-	//}
 
-	tic := time.Tick(1000 * time.Millisecond)
-FIRST:
-	for {
-		select {
-		case v := <-signalCh:
-			log.Println(v)
-			for i := 0; i < count; i++ {
-				exChan <- struct{}{}
+	go func(ch chan interface{}) {
+		tic := time.Tick(10 * time.Millisecond)
+		for {
+			select {
+			case <-exChan:
+				close(ch)
+				return
+			default:
+				<-tic
+				ch <- rand.Intn(100)
 			}
-			close(ch)
-			wg.Wait()
-			break FIRST
-		case <-tic:
-			ch <- rand.Intn(100)
 		}
+	}(ch)
+
+	<-signalCh
+	for i := 0; i < count+1; i++ {
+		exChan <- struct{}{}
 	}
+	wg.Wait()
 
 	defer close(exChan)
-	time.Sleep(1 * time.Second)
 }

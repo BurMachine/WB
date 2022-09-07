@@ -1,38 +1,38 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 )
 
 type worker struct {
 	Channel chan interface{}
-	timeDur chan struct{}
 }
 
 func main() {
 	time2 := inputTime()
-	timeRes := time.After(time.Duration(time2) * time.Second)
-	timeChannel := make(chan struct{})
+	//timeRes := time.After(time.Duration(time2) * time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(time2)*time.Second)
+	wg := sync.WaitGroup{}
 	ch := make(chan interface{})
 	n := make([]worker, 10)
 	for i := 0; i < 10; i++ {
 		n[i] = worker{
 			Channel: ch,
-			timeDur: timeChannel,
 		}
-		go n[i].work()
+		wg.Add(1)
+		go n[i].work(ctx, &wg)
 	}
-	defer close(timeChannel)
 	tic := time.Tick(1000 * time.Millisecond)
 	for {
 		select {
-		case <-timeRes:
-			timeChannel <- struct{}{}
+		case <-ctx.Done():
 			close(ch)
-			time.Sleep(2 * time.Second)
+			wg.Wait()
 			return
 		case <-tic:
 			ch <- rand.Intn(12)
@@ -40,15 +40,21 @@ func main() {
 	}
 }
 
-func (w worker) work() {
+func (w worker) work(ctx context.Context, wg *sync.WaitGroup) {
 	log.Println("Ready")
+	defer wg.Done()
 	for {
 		select {
-		case <-w.timeDur:
+		case <-ctx.Done():
+			if a, ok := <-w.Channel; ok {
+				log.Println(a)
+			}
 			log.Println("BB")
 			return
 		default:
-			log.Println(<-w.Channel)
+			if v, ok := <-w.Channel; ok {
+				log.Println(v)
+			}
 		}
 	}
 }
