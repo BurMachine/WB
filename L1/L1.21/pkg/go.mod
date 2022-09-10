@@ -1,3 +1,3 @@
-module data-server.go/pkg
+module pkg
 
 go 1.18
