@@ -1,6 +1,6 @@
 package main
 
-import "fmt
+import "fmt"
 
 // Есть свой тип, которому нужно соответствовать интерфейсу из пакета pkg, чтоб работать с этим пакетом
 type myData struct {
