@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// Есть свой тип, которому нужно соответствовать интерфейсу из пакета pkg, чтоб работать с этим пакетом
+// Есть свой тип, которому нужно соответствовать интерфейсу из пакета handlers, чтоб работать с этим пакетом
 type myData struct {
 	num float64
 }
@@ -19,6 +19,11 @@ type dataAdapter struct {
 
 // Метод адаптера который реализует интерфейс
 func (a *dataAdapter) getData() {
+	 
 	a.myData.convertToInt()
 	fmt.Print("Send myData")
+}
+
+func main() {
+	fmt.Println("aaa")
 }

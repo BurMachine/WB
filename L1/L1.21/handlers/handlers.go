@@ -1,4 +1,4 @@
-package pkg
+package handlers
 
 import "fmt"
 
@@ -7,6 +7,8 @@ import "fmt"
 type Dater interface {
 	GetData()
 }
+
+// DataCollector - its
 type DataCollector struct {
 	Num int
 }
