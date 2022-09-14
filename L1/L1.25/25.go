@@ -7,12 +7,12 @@ import (
 
 // SecondSleep
 // Реализация через тикер
-func SecondSleep(duration time.Duration) {
+func SecondSleep(duration time.Duration) time.Time {
 	ticker := time.Tick(duration)
 	for val := range ticker {
-		val.Clock()
-		return
+		return val
 	}
+	return time.Now()
 }
 
 // Sleep
@@ -26,4 +26,5 @@ func main() {
 	Sleep(3 * time.Second)
 	//SecondSleep(3 * time.Second)
 	fmt.Println("2")
+	time.Sleep()
 }
