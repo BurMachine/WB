@@ -1,6 +1,6 @@
 package pkgForBuilder
 
-type AsusCollector struct {
+type HpCollector struct {
 	Core    int
 	Brand   string
 	Memory  int
@@ -8,27 +8,27 @@ type AsusCollector struct {
 	Graph   int
 }
 
-func (a *AsusCollector) SetCore() {
+func (a *HpCollector) SetCore() {
 	a.Core = 4
 }
 
-func (a *AsusCollector) SetBrand() {
-	a.Brand = "Asus"
+func (a *HpCollector) SetBrand() {
+	a.Brand = "HP"
 }
 
-func (a *AsusCollector) SetMemory() {
-	a.Memory = 8
+func (a *HpCollector) SetMemory() {
+	a.Memory = 12
 }
 
-func (a *AsusCollector) SetGraph() {
+func (a *HpCollector) SetGraph() {
 	a.Graph = 2
 }
 
-func (a *AsusCollector) SetMonitor() {
-	a.Monitor = 1
+func (a *HpCollector) SetMonitor() {
+	a.Monitor = 2
 }
 
-func (a *AsusCollector) GetComputer() Computer {
+func (a *HpCollector) GetComputer() Computer {
 	return Computer{
 		Core:    a.Core,
 		Brand:   a.Brand,
