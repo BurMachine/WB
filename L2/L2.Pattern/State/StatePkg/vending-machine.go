@@ -53,8 +53,8 @@ func NewVendingMachine(itemCount, itemPrice int) *VendingMachine {
 	itemRequestedState := &ItemRequestState{vendingMachine: v}
 	noItemState := &NoItemsState{vendingMachine: v}
 	v.SetState(hasItemState)
-	v.hasItem = hasItemState
 	v.itemRequested = itemRequestedState
+	v.hasItem = hasItemState
 	v.noItem = noItemState
 	v.hasMoney = hasMoneyState
 	return v

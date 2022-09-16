@@ -11,6 +11,12 @@ type HasItemState struct {
 }
 
 func (n *HasItemState) AddItem(i int) error {
+	fmt.Printf("%d items added\n", i)
+	n.vendingMachine.IncrementItemCount(i)
+	return nil
+}
+
+func (n *HasItemState) RequestItem() error {
 	if n.vendingMachine.itemCount == 0 {
 		n.vendingMachine.SetState(n.vendingMachine.noItem)
 		return fmt.Errorf("No item present")
@@ -18,10 +24,6 @@ func (n *HasItemState) AddItem(i int) error {
 	fmt.Println("Item requested")
 	n.vendingMachine.SetState(n.vendingMachine.itemRequested)
 	return nil
-}
-
-func (n *HasItemState) RequestItem() error {
-	return fmt.Errorf("Item Dispense in progress.")
 }
 
 func (n *HasItemState) InsertMoney(money int) error {
