@@ -1,7 +1,11 @@
 package VisPkg
 
+/*
+	Visitor
+	Функции visit помогают нам добавлять функционал для наших типов
+*/
 type Visitor interface {
-	VisitSushiBar(p *Sushi) string
-	VisitPizzeria(p *Pizza) string
-	VisitBurgerBar(p *Burger) string
+	visitForSquare(*Square)
+	visitForCircle(*Circle)
+	visitForTriangle(*Triangle)
 }
