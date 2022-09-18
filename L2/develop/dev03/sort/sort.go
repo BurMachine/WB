@@ -52,6 +52,7 @@ func main() {
 
 	file := info.openFile()
 	res := info.fileProc(file)
+	fmt.Println(res)
 	info.Sorting(&res)
 	for _, re := range res {
 		if re != "" {
@@ -99,9 +100,52 @@ func USorting(text []string) []string {
 func KSorting(text []string, k int) []string {
 	tmp := make([]string, 0)
 	res := make([]string, 0)
-	for _, s := range text {
+	tmp1 := ""
+	tmp2 := make([]string, 0)
+	/*
+		Сплит строки
+		Замена слова[k] со словом[0]
+		Соеденить обратно воедино
+		Отсортировать
+		Разделить
+		Поменять все на место
+		Соеденить обратно
+	*/
+	for j, s := range text {
+		if j == 0 {
+			continue
+		}
 		tmp = append(tmp, strings.Split(s, " ")...)
+		tmp[k], tmp[0] = tmp[0], tmp[k]
+		for i, val := range tmp {
+			tmp1 += val
+			if i != len(tmp) {
+				tmp1 += " "
+			}
+		}
+		tmp2 = append(tmp2, tmp1)
+		tmp = tmp[:0]
+		tmp1 = ""
 	}
-	fmt.Println(tmp)
+	sort.Strings(tmp2)
+	// Возвращаю все на место
+
+	for _, s := range tmp2 {
+		tmp = append(tmp, strings.Split(s, " ")...)
+		tmp[k], tmp[0] = tmp[0], tmp[k]
+		for i, val := range tmp {
+			tmp1 += val
+			if i != len(tmp) {
+				tmp1 += " "
+			}
+		}
+		res = append(res, tmp1)
+		tmp = tmp[:0]
+		tmp1 = ""
+	}
+	//for i := 0; i < len(res); i++ {
+	//	fmt.Println(res[i])
+	//
+	//}
 	return res
 }
