@@ -62,18 +62,23 @@ func main() {
 }
 
 func (flags *Info) Sorting(slice *[]string) {
-	sort.Strings(*slice)
 
 	if flags.r {
+		sort.Strings(*slice)
 		RSorting(*slice)
 	}
 
 	if flags.u {
+		sort.Strings(*slice)
 		*slice = USorting(*slice)
 	}
 
 	if flags.k > -1 {
 		*slice = KSorting(*slice, flags.k)
+	}
+
+	if flags.n {
+		return
 	}
 }
 
