@@ -1,7 +1,6 @@
-package main
+package anagramm
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 )
@@ -24,6 +23,7 @@ func FindAnagram(str *[]string) map[string][]string {
 	sliceString := make([]string, 0)
 	tmpString := ""
 	for _, str := range *str {
+		str = strings.ToLower(str)
 		sliceString = strings.Split(str, "")
 		sort.Strings(sliceString)
 		tmpString = concatenate(sliceString)
@@ -37,8 +37,6 @@ func FindAnagram(str *[]string) map[string][]string {
 			tmpMap[tmpString] = a
 		}
 	}
-	fmt.Println(nameArray)
-	fmt.Println(nameArraySorted)
 	refactorMap(&tmpMap, nameArray, nameArraySorted)
 	return tmpMap
 }
@@ -61,10 +59,4 @@ func concatenate(str []string) string {
 		res += s
 	}
 	return res
-}
-
-func main() {
-	str := []string{"кот", "ток", "окт", "кит"}
-	ma := FindAnagram(&str)
-	fmt.Println(ma)
 }
