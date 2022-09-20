@@ -110,6 +110,36 @@ CYCLE:
 	return res
 }
 
+func (flagStruct Flags) FindContext(str []string) []string {
+	res := make([]string, 0)
+	tmpMap := make(map[string]int)
+	/*
+		Похожу по строке
+		Если встречаю нужную, то кладу в res
+		каждую добавленную строку кладу в мапу, как значение кладу индекс
+	*/
+	for i := 0; i < len(str); i++ {
+		matched, _ := regexp.MatchString(flagStruct.DesiredValue, str[i])
+		if matched {
+			goalMin := 0
+			goalMax := i + flagStruct.cBig
+			if i >= flagStruct.cBig {
+				goalMin = i - flagStruct.cBig
+			}
+			for i = goalMin; i < goalMax+1; i++ {
+				if i != len(str) {
+					if _, ok := tmpMap[str[i]]; ok && tmpMap[str[i]] == i {
+						continue
+					} else {
+						res = append(res, str[i])
+					}
+				}
+			}
+		}
+	}
+	return res
+}
+
 func (flagStruct Flags) Find(str []string) []string {
 	flagsOff := true
 	res := make([]string, 10)
@@ -141,6 +171,11 @@ func (flagStruct Flags) Find(str []string) []string {
 	if flagStruct.b > -1 {
 		flagsOff = false
 		res = flagStruct.FindBefore(str)
+	}
+
+	if flagStruct.cBig > -1 {
+		flagsOff = false
+		res = flagStruct.FindContext(str)
 	}
 
 	if flagsOff {

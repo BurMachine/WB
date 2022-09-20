@@ -11,7 +11,10 @@ func main() {
 	Flags.Input()
 	str := Flags.OpenFile()
 	str2 := Flags.Find(str)
-	for _, s := range str2 {
+	for i, s := range str2 {
+		if i == 0 && s == "" {
+			continue
+		}
 		fmt.Println(s)
 	}
 	fmt.Println(Flags)
