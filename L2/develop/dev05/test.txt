@@ -1,0 +1,8 @@
+grep realization
+grep test
+grep test 1
+grep test 2
+grep
+tests without
+type error
+example string
