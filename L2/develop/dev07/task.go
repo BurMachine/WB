@@ -38,17 +38,21 @@ func main() {
 		sig(2*time.Second),
 		sig(3*time.Second),
 	)
-BIG:
-	for {
-		ok := false
-		select {
-		case channel, ok := <-ch:
-			if !ok {
-				break BIG
-			}
-			fmt.Println("1:", channel)
 
-		}
-	}
-	fmt.Println(time.Since(start).Milliseconds())
+	fmt.Println("1:", <-ch)
+	fmt.Println("2:", <-ch)
+	fmt.Println("3:", <-ch)
+	//BIG:
+	//	for {
+	//		ok := false
+	//		select {
+	//		case channel, ok := <-ch:
+	//			if !ok {
+	//				break BIG
+	//			}
+	//			fmt.Println("1:", channel)
+	//
+	//		}
+	//	}
+	fmt.Println(time.Since(start))
 }
