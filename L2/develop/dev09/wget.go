@@ -13,6 +13,7 @@ type wget struct {
 	html []byte
 }
 
+// Устанавливает адрес в структуру
 func (w *wget) SetAddr(str string) {
 	_, err := url.ParseRequestURI(str)
 	if err != nil {
@@ -21,6 +22,10 @@ func (w *wget) SetAddr(str string) {
 	w.addr = str
 }
 
+/*
+....GetBody()
+....Возвращает html разметку страницы
+*/
 func (w *wget) GetBody() string {
 	req, err := http.Get(w.addr)
 	if err != nil {
@@ -35,6 +40,7 @@ func (w *wget) GetBody() string {
 	return string(w.html)
 }
 
+// Записывает html в структуру
 func (w *wget) WriteFile() error {
 	file, err := os.Create("index.html")
 	if err != nil {
