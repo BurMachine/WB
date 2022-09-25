@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,16 +15,16 @@ import (
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	for {
+	for { // Цикл программы
 		cur, _ := user.Current()
 		fmt.Print(cur.Name+"@", "-->  ")
-		command, err := reader.ReadString('\n')
+		command, err := reader.ReadString('\n') // Чтение программы
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			break
 		}
 
-		err = Processing(command)
+		err = Processing(command) // Выполнение
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			break
@@ -33,55 +32,27 @@ func main() {
 	}
 }
 
-func Processing(str string) error {
-	//var err error
-	//str1 := strings.Trim(str, "\n")
-	//arr := strings.Split(str1, ";")
-	//for _, command := range arr {
-	//	com := strings.Trim(command, " ")
-	//	args := strings.Split(com, " ")
-	//	switch args[0] {
-	//	case "cd":
-	//		if len(args) < 2 {
-	//			fmt.Println("path error не написал")
-	//			return nil
-	//		}
-	//
-	//	case "exit":
-	//		os.Exit(0)
-	//	default:
-	//		fmt.Println("Еще раз)")
-	//	}
-	//	cmd := exec.Command("/bin/sh", args[0], args[1])
-	//	cmd.Stderr = os.Stderr
-	//	cmd.Stdout = os.Stdout
-	//	err = cmd.Run()
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
-	//return err
-	var err error
-	fmt.Println(str)
-	non := strings.Trim(str, "\n")
-	commands := strings.Split(non, ";")
+func Processing(str string) (err error) {
+	non := strings.Trim(str, "\n")      // Убираю перенос строки
+	commands := strings.Split(non, ";") // Разделяю по знаку ';' т.к. может быть последовательнось комманд
 	for _, command := range commands {
 		com := strings.Trim(command, " ")
 		args := strings.Split(com, " ")
-		switch args[0] {
+		switch args[0] { // проверки для cd/exit
 		case "cd":
 			if len(args) < 2 {
-				return errors.New("path required")
+				fmt.Println("path error не написал")
+				return nil
 			}
 			continue
 		case "exit":
+			fmt.Println("Terminated")
 			os.Exit(0)
 		}
-		cmd := exec.Command(args[0], args[1:]...)
+		cmd := exec.Command(args[0], args[1:]...) // Заполнеие полей cmd структуры
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
-		err = cmd.Run()
+		err = cmd.Run() // Непосредственно выполнеие программы
 	}
-
 	return err
 }
