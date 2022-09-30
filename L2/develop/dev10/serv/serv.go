@@ -1,6 +1,9 @@
 package main
 
-import "net"
+import (
+	"net"
+	"time"
+)
 import "fmt"
 import "bufio"
 import "strings" // требуется только ниже для обработки примера
@@ -25,5 +28,6 @@ func main() {
 		newmessage := strings.ToUpper(message)
 		// Отправить новую строку обратно клиенту
 		conn.Write([]byte(newmessage + "\n"))
+		time.Sleep(500 * time.Millisecond)
 	}
 }

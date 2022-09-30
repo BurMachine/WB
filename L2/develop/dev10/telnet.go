@@ -41,12 +41,17 @@ func main() {
 		log.Fatal("Connection error:\n", err)
 	}
 	defer conn.Close()
-	go func(conn net.Conn) {
+	go func(conn net.Conn, exit chan os.Signal) {
 		for {
 			// Чтение входных данных от stdin
 			reader := bufio.NewReader(os.Stdin)
 			fmt.Print("Text to send: ")
-			text, _ := reader.ReadString('\n')
+			text, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error reading string: %v\n", err)
+				exit <- syscall.SIGQUIT
+				return
+			}
 			// Отправляем в socket
 			_, err = fmt.Fprintf(conn, text+"\n")
 			if err != nil {
@@ -56,7 +61,7 @@ func main() {
 			message, _ := bufio.NewReader(conn).ReadString('\n')
 			fmt.Print("Message from server: " + message)
 		}
-	}(conn)
+	}(conn, quit)
 	select {
 	case <-quit:
 		log.Println("Exit")
