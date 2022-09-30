@@ -1,0 +1,10 @@
+
+
+POST localhost:8080/create_event
+Content-Type: application/json
+
+{
+  "uuid": "1",
+  "date": "2022-12-31",
+  "event": "новый год еп"
+}
