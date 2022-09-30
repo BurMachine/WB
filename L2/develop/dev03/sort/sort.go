@@ -100,17 +100,8 @@ func KSorting(text []string, k int) []string {
 	tmp := make([]string, 0)
 	res := make([]string, 0)
 	for _, s := range text {
-		/*
-			разделить
-			поменять местами слово по которому сортируем и 0-ое
-			склеить
-			отсортировать
-			вернуть все на место
-			как?
-		*/
 		tmp = append(tmp, strings.Split(s, " ")...)
 	}
-	sort.Strings(tmp)
 	fmt.Println(tmp)
 	return res
 }
