@@ -4,10 +4,11 @@ import (
 	"container/list"
 	"fmt"
 	"log"
+	"reflect"
 )
 
 type Item struct {
-	Key   string      // Клюс
+	Key   string      // Ключ
 	Value interface{} // Значение кешируемошо элемента
 }
 
@@ -75,19 +76,52 @@ func (c LRU) Get(key string) interface{} {
 	return element.Value.(*Item).Value
 }
 
+type jsonForFind struct {
+	Uuid  string `json:"uuid"`
+	Date  string `json:"date"`
+	Event string `json:"event"`
+}
+
 func (c LRU) FindForDaY(param string) []interface{} {
 	/*
 		Как искать в кеше по дате
 		Надстройка в сигнатуре функции, где мжет быь один параметр из трез возможных?
 		day/month/year
 	*/
+	res := make([]interface{}, 10)
+
 	if param == "day" {
-		/*
-			Прохожусь по
-		*/
+		for _, value := range c.items {
+			//j := new(jsonForFind)
+			val := value.Value.(*Item).Value
+			v := fmt.Sprintf("%v", val)
+			log.Println(reflect.TypeOf(v))
+			//str := strings.Trim(v, "{")
+			//str = strings.Trim(str, "}")
+			//log.Println(str)
+			//err := json.Unmarshal([]byte(str1), j)
+			//if err != nil {
+			//	log.Println(err)
+			//}
+			//log.Println(j)
+			/*
+				  ПРОБЛЕМА
+				Как распаковать json, если это не json
+			*/
+
+		}
 	} else if param == "month" {
 
 	} else if param == "year" {
 
 	}
+	return res
+}
+
+func ConvertJson(str string) string {
+	str1 := []rune(str)
+	for _, val := range str1 {
+		log.Println(val)
+	}
+	return str
 }

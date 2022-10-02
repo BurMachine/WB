@@ -90,7 +90,7 @@ func (d *Data) eventsForDay(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("err get method", *r)
 		return
 	}
-
+	d.cache.FindForDaY("day")
 }
 
 //*************************************  SUPPORT  ******************************************
@@ -124,5 +124,7 @@ func (d *Data) regMux(mux *http.ServeMux) *http.ServeMux {
 	mux1.HandleFunc("/delete_event", d.deleteEvent)
 
 	mux1.HandleFunc("/get_event", d.getEvent)
+	mux1.HandleFunc("/events_for_day", d.eventsForDay)
+
 	return mux1
 }
