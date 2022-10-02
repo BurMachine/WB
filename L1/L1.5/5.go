@@ -16,7 +16,7 @@ type worker struct {
 func main() {
 	time2 := inputTime()
 	//timeRes := time.After(time.Duration(time2) * time.Second)
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(time2)*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(time2)*time.Second) // создается тип контекст, который вернет в канал сигнал о завершении
 	wg := sync.WaitGroup{}
 	ch := make(chan interface{})
 	n := make([]worker, 10)

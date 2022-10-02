@@ -16,7 +16,7 @@ func SecondSleep(duration time.Duration) time.Time {
 }
 
 // Sleep
-//Реализация через канал time.After
+// Реализация через канал time.After
 func Sleep(duration time.Duration) {
 	<-time.After(duration)
 }
@@ -26,5 +26,5 @@ func main() {
 	Sleep(3 * time.Second)
 	//SecondSleep(3 * time.Second)
 	fmt.Println("2")
-	time.Sleep()
+	//time.Sleep()
 }

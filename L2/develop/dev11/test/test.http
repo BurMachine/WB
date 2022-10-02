@@ -8,3 +8,31 @@ Content-Type: application/json
   "date": "2022-12-31",
   "event": "новый год еп"
 }
+
+###
+
+POST localhost:8080/create_event
+Content-Type: application/json
+
+{
+  "uuid": "1",
+  "date": "2022-11-16",
+  "event": "день рождения еп"
+}
+
+###
+
+POST localhost:8080/delete_event
+Content-Type: application/json
+
+{
+  "uuid": "1",
+  "date": "",
+  "event": ""
+}
+
+###
+
+GET localhost:8080/get_event?uid=1
+
+###

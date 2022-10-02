@@ -1,70 +1,65 @@
 package main
 
 import (
-	"bufio"
-	"flag"
-	"fmt"
-	"log"
-	"net"
-	"os"
-	"os/signal"
-	"syscall"
+	"math/rand"
 	"time"
 )
 
-type Info struct {
-	addr    string
-	port    string
-	timeout int
+const PROBABILITY_GOAL = 0.0001
+const PROBABILITY_FIRST_TEAM_GOAL = 0.55
+const STAMPS_NUMBER = 50000
+
+type Score struct {
+	Home int
+	Away int
 }
 
-func (i *Info) Flags() {
-	timeout := flag.Int("timeout", 10, "timeout time")
-	flag.Parse()
-	i.timeout = *timeout
-	i.addr = os.Args[len(os.Args)-2]
-	i.port = os.Args[len(os.Args)-1]
+type ScoreStamp struct {
+	Offset int
+	Score  Score
 }
 
-func main() {
-	flags := new(Info)
-	flags.Flags()
-	fmt.Println(flags)
+func fillScores() *[]ScoreStamp {
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGQUIT, syscall.SIGINT)
-	// Подключаемся к сокету
-	timeout := time.Duration(flags.timeout) * time.Second
-	d := net.Dialer{Timeout: timeout}
-	conn, err := d.Dial("tcp", flags.addr+":"+flags.port)
-	if err != nil {
-		log.Fatal("Connection error:\n", err)
-	}
-	defer conn.Close()
-	go func(conn net.Conn, exit chan os.Signal) {
-		for {
-			// Чтение входных данных от stdin
-			reader := bufio.NewReader(os.Stdin)
-			fmt.Print("Text to send: ")
-			text, err := reader.ReadString('\n')
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error reading string: %v\n", err)
-				exit <- syscall.SIGQUIT
-				return
+	scores := make([]ScoreStamp, 0, 10)
+
+	for i := 0; i < STAMPS_NUMBER; i++ {
+		scoreChanged := random.Float32() < PROBABILITY_GOAL
+		home := 0
+		away := 0
+
+		if scoreChanged {
+			if random.Float32() < PROBABILITY_FIRST_TEAM_GOAL {
+				home = 1
+				away = 0
+			} else {
+				home = 0
+				away = 1
 			}
-			// Отправляем в socket
-			_, err = fmt.Fprintf(conn, text+"\n")
-			if err != nil {
-				log.Fatal("Send error:\n", err)
-			}
-			// Прослушиваем ответ
-			message, _ := bufio.NewReader(conn).ReadString('\n')
-			fmt.Print("Message from server: " + message)
 		}
-	}(conn, quit)
-	select {
-	case <-quit:
-		log.Println("Exit")
-		os.Exit(0)
+
+		var prevScore Score
+		if len(scores) == 0 {
+			prevScore = Score{
+				Home: 0,
+				Away: 0,
+			}
+		} else {
+			prevScore = scores[i-1].Score
+		}
+
+		newScore := Score{
+			Home: prevScore.Home + home,
+			Away: prevScore.Away + away,
+		}
+		scores = append(scores, ScoreStamp{Offset: i, Score: newScore})
 	}
+
+	return &scores
+}
+
+func getScore(scores *[]ScoreStamp, offset int) Score {
+	// continue the function's implementation
+	return Score{}
 }
