@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 )
 
 type Item struct {
@@ -82,20 +83,45 @@ type jsonForFind struct {
 	Event string `json:"event"`
 }
 
-func (c LRU) FindForDaY(param string) []interface{} {
+func (c LRU) FindForDaY(param string) [][]string {
 	/*
 		Как искать в кеше по дате
 		Надстройка в сигнатуре функции, где мжет быь один параметр из трез возможных?
 		day/month/year
 	*/
-	res := make([]interface{}, 10)
+	res := make([][]string, 0)
 
 	if param == "day" {
 		for _, value := range c.items {
+			tmp := make([]string, 0, 3)
+			tmpStr := ""
 			//j := new(jsonForFind)
-			val := value.Value.(*Item).Value
-			v := fmt.Sprintf("%v", val)
+			v := fmt.Sprintf("%v", value.Value.(*Item).Value)
 			log.Println(reflect.TypeOf(v))
+
+			str1 := strings.Trim(v, "{")
+			str1 = strings.Trim(str1, "}")
+
+			str := strings.Split(str1, " ")
+			for i := 0; i < len(str); i++ {
+				if i == 0 {
+					tmp = append(tmp, str[i])
+					continue
+				}
+				if i == 1 {
+					tmp = append(tmp, str[i])
+					continue
+				}
+				tmpStr += str[i]
+				tmpStr += " "
+			}
+			tmp = append(tmp, tmpStr)
+			res = append(res, tmp)
+			for _, re := range res {
+				for _, ress := range re {
+					log.Println(ress)
+				}
+			}
 			//str := strings.Trim(v, "{")
 			//str = strings.Trim(str, "}")
 			//log.Println(str)
