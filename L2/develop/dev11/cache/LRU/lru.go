@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"fmt"
 	"log"
-	"reflect"
 	"strings"
 )
 
@@ -57,7 +56,7 @@ func (c *LRU) Set(key string, value interface{}) bool {
 	if c.queue.Len() == c.capacity { // Если достигли cap
 		c.purge() // Удаляем послледний элемент
 	}
-	log.Println(c.queue.Len())
+	//log.Println(c.queue.Len())
 
 	item := &Item{
 		Key:   key,
@@ -83,7 +82,7 @@ type jsonForFind struct {
 	Event string `json:"event"`
 }
 
-func (c LRU) FindForDaY(param string) [][]string {
+func (c LRU) GetAllData() [][]string {
 	/*
 		Как искать в кеше по дате
 		Надстройка в сигнатуре функции, где мжет быь один параметр из трез возможных?
@@ -91,55 +90,29 @@ func (c LRU) FindForDaY(param string) [][]string {
 	*/
 	res := make([][]string, 0)
 
-	if param == "day" {
-		for _, value := range c.items {
-			tmp := make([]string, 0, 3)
-			tmpStr := ""
-			//j := new(jsonForFind)
-			v := fmt.Sprintf("%v", value.Value.(*Item).Value)
-			log.Println(reflect.TypeOf(v))
+	for _, value := range c.items {
+		tmp := make([]string, 0, 3)
+		tmpStr := ""
+		v := fmt.Sprintf("%v", value.Value.(*Item).Value)
 
-			str1 := strings.Trim(v, "{")
-			str1 = strings.Trim(str1, "}")
+		str1 := strings.Trim(v, "{")
+		str1 = strings.Trim(str1, "}")
 
-			str := strings.Split(str1, " ")
-			for i := 0; i < len(str); i++ {
-				if i == 0 {
-					tmp = append(tmp, str[i])
-					continue
-				}
-				if i == 1 {
-					tmp = append(tmp, str[i])
-					continue
-				}
-				tmpStr += str[i]
-				tmpStr += " "
+		str := strings.Split(str1, " ")
+		for i := 0; i < len(str); i++ {
+			if i == 0 {
+				tmp = append(tmp, str[i])
+				continue
 			}
-			tmp = append(tmp, tmpStr)
-			res = append(res, tmp)
-			for _, re := range res {
-				for _, ress := range re {
-					log.Println(ress)
-				}
+			if i == 1 {
+				tmp = append(tmp, str[i])
+				continue
 			}
-			//str := strings.Trim(v, "{")
-			//str = strings.Trim(str, "}")
-			//log.Println(str)
-			//err := json.Unmarshal([]byte(str1), j)
-			//if err != nil {
-			//	log.Println(err)
-			//}
-			//log.Println(j)
-			/*
-				  ПРОБЛЕМА
-				Как распаковать json, если это не json
-			*/
-
+			tmpStr += str[i]
+			tmpStr += " "
 		}
-	} else if param == "month" {
-
-	} else if param == "year" {
-
+		tmp = append(tmp, tmpStr)
+		res = append(res, tmp)
 	}
 	return res
 }

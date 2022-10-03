@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
   "uuid": "2",
-  "date": "2022-11-16",
+  "date": "2022-10-16",
   "event": "день рождения еп"
 }
 
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 {
   "uuid": "3",
-  "date": "2022-11-17",
+  "date": "2022-10-03",
   "event": "день рождения мое еп"
 }
 
@@ -38,7 +38,7 @@ POST localhost:8080/delete_event
 Content-Type: application/json
 
 {
-  "uuid": "1",
+  "uuid": "2",
   "date": "",
   "event": ""
 }
@@ -51,6 +51,14 @@ GET localhost:8080/get_event?uid=1
 
 ###
 
-GET localhost:8080/events_for_day
+GET localhost:8080/events_for_day?date=2022-10-03
+
+###
+
+GET localhost:8080/events_for_week?date=2022-10-03
+
+###
+
+GET localhost:8080/events_for_month?date=2022-10-03
 
 ###

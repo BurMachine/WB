@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -90,7 +91,41 @@ func (d *Data) eventsForDay(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("err get method", *r)
 		return
 	}
-	d.cache.FindForDaY("day")
+	quer := r.URL.Query()
+	today := strings.Split(quer.Get("date"), "-")
+	res := d.DateFind("day", d.cache.GetAllData(), today)
+	for _, re := range res {
+		log.Println(*re)
+	}
+	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
+}
+
+func (d *Data) eventsForMonth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		fmt.Println("err get method", *r)
+		return
+	}
+	quer := r.URL.Query()
+	today := strings.Split(quer.Get("date"), "-")
+	res := d.DateFind("month", d.cache.GetAllData(), today)
+	for _, re := range res {
+		log.Println(*re)
+	}
+	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
+}
+
+func (d *Data) eventsForWeek(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		fmt.Println("err get method", *r)
+		return
+	}
+	quer := r.URL.Query()
+	today := strings.Split(quer.Get("date"), "-")
+	res := d.DateFind("week", d.cache.GetAllData(), today)
+	for _, re := range res {
+		log.Println(*re)
+	}
+	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
 }
 
 //*************************************  SUPPORT  ******************************************
@@ -108,10 +143,54 @@ func (d *Data) ParsePostBody(r *http.Request) {
 	}
 }
 
-func (d Data) DateParse() []string {
-	res := strings.Split(d.json.Date, "-")
-	log.Println(res)
+func (d Data) DateFind(str string, data [][]string, today []string) []*jsonStruct {
+	res := make([]*jsonStruct, 0)
+	for _, d := range data {
+		tmp := strings.Split(d[1], "-")
+		if DateParse(str, tmp, today) {
+			j := &jsonStruct{
+				Uuid:  d[0],
+				Date:  d[1],
+				Event: d[2],
+			}
+			res = append(res, j)
+		}
+	}
 	return res
+}
+
+func DateParse(param string, date, today []string) bool {
+	if param == "day" {
+		if date[2] == today[2] {
+			log.Println(date, "Is fits(day)")
+			return true
+		} else {
+			log.Println(date, "Is not fits(day)")
+			return false
+		}
+	} else if param == "month" {
+		if date[1] == today[1] {
+			log.Println(date, "Is fits(month)")
+			return true
+		} else {
+			log.Println(date, "Is not fits(month)")
+			return false
+		}
+	} else if param == "week" {
+		val1, err := strconv.Atoi(date[2])
+		if err != nil {
+			fmt.Println("Atoi error in week processing: ", err)
+		}
+		val2, err := strconv.Atoi(today[2])
+		if val1 >= val2 && val1 <= val2+7 {
+			log.Println(date, "Is fits(week)")
+			return true
+		} else {
+			log.Println(date, "Is not fits(week)")
+			return false
+		}
+	}
+	return true
 }
 
 //********************************** REGISTRATION HANDLERS  *********************************S
@@ -125,6 +204,8 @@ func (d *Data) regMux(mux *http.ServeMux) *http.ServeMux {
 
 	mux1.HandleFunc("/get_event", d.getEvent)
 	mux1.HandleFunc("/events_for_day", d.eventsForDay)
+	mux1.HandleFunc("/events_for_week", d.eventsForWeek)
+	mux1.HandleFunc("/events_for_month", d.eventsForMonth)
 
 	return mux1
 }
