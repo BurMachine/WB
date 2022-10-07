@@ -211,18 +211,27 @@ func PrinterJson(res []*jsonStruct, w http.ResponseWriter) error {
 	return nil
 }
 
+//********************************** MIDDLEWARE  ********************************************
+
+func (d Data) MiddleWareHandler(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		log.Println(request.URL, request.Method)
+		next(writer, request)
+	})
+}
+
 //********************************** REGISTRATION HANDLERS  *********************************
 
 func (d *Data) regMux(mux *http.ServeMux) *http.ServeMux {
 	mux1 := mux
-	mux1.HandleFunc("/create_event", d.createUpdateEvent)
-	mux1.HandleFunc("/update_event", d.createUpdateEvent)
-	mux1.HandleFunc("/delete_event", d.deleteEvent)
+	mux1.HandleFunc("/create_event", d.MiddleWareHandler(d.createUpdateEvent))
+	mux1.HandleFunc("/update_event", d.MiddleWareHandler(d.createUpdateEvent))
+	mux1.HandleFunc("/delete_event", d.MiddleWareHandler(d.deleteEvent))
 
-	mux1.HandleFunc("/get_event", d.getEvent)
-	mux1.HandleFunc("/events_for_day", d.eventsForDay)
-	mux1.HandleFunc("/events_for_week", d.eventsForWeek)
-	mux1.HandleFunc("/events_for_month", d.eventsForMonth)
+	mux1.HandleFunc("/get_event", d.MiddleWareHandler(d.getEvent))
+	mux1.HandleFunc("/events_for_day", d.MiddleWareHandler(d.eventsForDay))
+	mux1.HandleFunc("/events_for_week", d.MiddleWareHandler(d.eventsForWeek))
+	mux1.HandleFunc("/events_for_month", d.MiddleWareHandler(d.eventsForMonth))
 
 	return mux1
 }

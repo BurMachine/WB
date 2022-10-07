@@ -62,3 +62,7 @@ GET localhost:8080/events_for_week?date=2022-10-03
 GET localhost:8080/events_for_month?date=2022-10-03
 
 ###
+
+GET localhost:8080/events_for_month?date=202222222
+
+###
