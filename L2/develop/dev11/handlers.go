@@ -56,7 +56,6 @@ func (d *Data) getEvent(w http.ResponseWriter, r *http.Request) {
 	quer := r.URL.Query()
 	uid := quer.Get("uid")
 	log.Println(d.cache.Get(uid), "вытащил из лру кэша")
-	//log.Println(j)
 }
 
 func (d *Data) eventsForDay(w http.ResponseWriter, r *http.Request) {
@@ -66,11 +65,16 @@ func (d *Data) eventsForDay(w http.ResponseWriter, r *http.Request) {
 	}
 	quer := r.URL.Query()
 	today := strings.Split(quer.Get("date"), "-")
-	res := d.DateFind("day", d.cache.GetAllData(), today)
-	for _, re := range res {
-		log.Println(*re)
+	res, err := d.DateFind("day", d.cache.GetAllData(), today)
+	if err != nil {
+		http.Error(w, "b logic error", 503)
+		return
 	}
-	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
+	err = PrinterJson(res, w)
+	if err != nil {
+		http.Error(w, "print data error", 500)
+		return
+	}
 }
 
 func (d *Data) eventsForMonth(w http.ResponseWriter, r *http.Request) {
@@ -80,11 +84,16 @@ func (d *Data) eventsForMonth(w http.ResponseWriter, r *http.Request) {
 	}
 	quer := r.URL.Query()
 	today := strings.Split(quer.Get("date"), "-")
-	res := d.DateFind("month", d.cache.GetAllData(), today)
-	for _, re := range res {
-		log.Println(*re)
+	res, err := d.DateFind("month", d.cache.GetAllData(), today)
+	if err != nil {
+		http.Error(w, "b logic error", 503)
+		return
 	}
-	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
+	err = PrinterJson(res, w)
+	if err != nil {
+		http.Error(w, "print data error", 500)
+		return
+	}
 }
 
 func (d *Data) eventsForWeek(w http.ResponseWriter, r *http.Request) {
@@ -94,11 +103,16 @@ func (d *Data) eventsForWeek(w http.ResponseWriter, r *http.Request) {
 	}
 	quer := r.URL.Query()
 	today := strings.Split(quer.Get("date"), "-")
-	res := d.DateFind("week", d.cache.GetAllData(), today)
-	for _, re := range res {
-		log.Println(*re)
+	res, err := d.DateFind("week", d.cache.GetAllData(), today)
+	if err != nil {
+		http.Error(w, "b logic error", 503)
+		return
 	}
-	// Нужно печатать в врайтер!!!!!!!!!!!!!!!!!!
+	err = PrinterJson(res, w)
+	if err != nil {
+		http.Error(w, "print data error", 500)
+		return
+	}
 }
 
 //*************************************  SUPPORT  ******************************************
@@ -116,11 +130,16 @@ func (d *Data) ParsePostBody(r *http.Request) {
 	}
 }
 
-func (d Data) DateFind(str string, data [][]string, today []string) []*jsonStruct {
+func (d Data) DateFind(str string, data [][]string, today []string) ([]*jsonStruct, error) {
 	res := make([]*jsonStruct, 0)
 	for _, d := range data {
 		tmp := strings.Split(d[1], "-")
-		if DateParse(str, tmp, today) {
+		ok, err := DateParse(str, tmp, today)
+		if err != nil {
+			log.Println("Date parse error :", err)
+			return nil, err
+		}
+		if ok {
 			j := &jsonStruct{
 				Uuid:  d[0],
 				Date:  d[1],
@@ -129,44 +148,70 @@ func (d Data) DateFind(str string, data [][]string, today []string) []*jsonStruc
 			res = append(res, j)
 		}
 	}
-	return res
+	return res, nil
 }
 
-func DateParse(param string, date, today []string) bool {
+func DateParse(param string, date, today []string) (bool, error) {
 	if param == "day" {
 		if date[2] == today[2] {
 			log.Println(date, "Is fits(day)")
-			return true
+			return true, nil
 		} else {
 			log.Println(date, "Is not fits(day)")
-			return false
+			return false, nil
 		}
 	} else if param == "month" {
 		if date[1] == today[1] {
 			log.Println(date, "Is fits(month)")
-			return true
+			return true, nil
 		} else {
 			log.Println(date, "Is not fits(month)")
-			return false
+			return false, nil
 		}
 	} else if param == "week" {
 		val1, err := strconv.Atoi(date[2])
 		if err != nil {
 			fmt.Println("Atoi error in week processing: ", err)
+			return false, err
 		}
 		val2, err := strconv.Atoi(today[2])
 		if val1 >= val2 && val1 <= val2+7 {
 			log.Println(date, "Is fits(week)")
-			return true
+			return true, nil
 		} else {
 			log.Println(date, "Is not fits(week)")
-			return false
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
-//********************************** REGISTRATION HANDLERS  *********************************S
+func PrinterJson(res []*jsonStruct, w http.ResponseWriter) error {
+	js := new(jsonStruct)
+	str := ""
+	for _, re := range res {
+		log.Println(*re)
+		js.Uuid = re.Uuid
+		js.Date = re.Date
+		js.Event = re.Event
+		var b []byte
+		b, err := json.Marshal(js)
+		if err != nil {
+			log.Println("Marshalling error :", err)
+			return err
+		}
+		str += string(b)
+		str += "\n"
+	}
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		log.Println("Write error :", err)
+		return err
+	}
+	return nil
+}
+
+//********************************** REGISTRATION HANDLERS  *********************************
 
 func (d *Data) regMux(mux *http.ServeMux) *http.ServeMux {
 	mux1 := mux

@@ -1,35 +1,67 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"log"
+	"math/rand"
+	"os"
+	"os/signal"
+	"sync"
+	"time"
+)
 
-type demo struct {
-	s string
-}
+func worker(wg *sync.WaitGroup, ctx context.Context, ch chan int, num int, exit chan struct{}) {
+	defer wg.Done()
+	for {
+		select {
+		case <-exit:
+			log.Println("Пока")
+			return
+		default:
+			ctx, _ := context.WithTimeout(ctx, 3*time.Second)
+			go func(ctx context.Context, ch chan int, num int) {
+				select {
+				case <-ctx.Done():
+					ch <- num
+				}
+			}(ctx, ch, num)
+			time1 := rand.Intn(3)
+			time.Sleep(time.Duration(time1) * time.Second)
+			fmt.Println("Привет")
+		}
 
-func change(a []demo) {
-	for _, d := range a {
-		d.s = "246"
-	}
-}
-
-func changeP(a []*demo) {
-	for _, d := range a {
-		d.s = "246"
 	}
 }
 
 func main() {
-	d := make([]demo, 5)
-	dP := make([]*demo, 5)
-	for i := 0; i < 5; i++ {
-		d[i].s = "123"
-		dP[i] = new(demo)
-		dP[i].s = "123"
+	wg := &sync.WaitGroup{}
+	c := context.Background()
+	ch := make(chan int, 10)
+	exChan := make(chan struct{}, 10)
+	signalCh := make(chan os.Signal)
+	signal.Notify(signalCh, os.Kill, os.Interrupt)
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go worker(wg, c, ch, i, exChan)
 	}
-	change(d)
-	changeP(dP)
-	fmt.Println(d)
-	for _, d2 := range dP {
-		fmt.Println((*d2).s)
+	go func(ch chan int) {
+		for {
+			select {
+			case a, ok := <-ch:
+				if !ok {
+					continue
+				}
+				log.Println("gorutine number:", a)
+			}
+		}
+	}(ch)
+
+	<-signalCh
+	for i := 0; i < 10; i++ {
+		exChan <- struct{}{}
 	}
+	defer close(ch)
+	wg.Wait()
 }
