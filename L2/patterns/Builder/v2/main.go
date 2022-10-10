@@ -28,7 +28,7 @@ type Auto struct {
 	Name           string
 }
 
-//*************************** Конкрутный строитель Toyota
+//*************************** Конкретный строитель Toyota
 
 type Toyota struct {
 	HP          int
