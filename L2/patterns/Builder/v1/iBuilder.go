@@ -8,7 +8,7 @@ type Builder interface {
 	SetDoorType()
 	SetFloorNum()
 	SetWindowType()
-	GetHouse()
+	GetHouse() House
 }
 
 // Возвращает объект, того типа, который мы создаем(Методы создания реализованы непосредственно для того типа, который создается
