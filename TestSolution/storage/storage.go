@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type Storage struct {
@@ -48,4 +49,16 @@ func (s *Storage) Set(data []byte) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) Get(userId string) ([]byte, error) {
+	tmp, ok := s.data[userId]
+	if !ok {
+		return nil, fmt.Errorf("user '%s' - does not exist in storage")
+	}
+	res, err := json.Marshal(tmp)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

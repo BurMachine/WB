@@ -30,7 +30,7 @@ func main() {
 	muxGet := gorillaMux.NewRouter()
 
 	muxSet.HandleFunc("/", handlerStorage.SetHandler).Methods("POST")
-	muxGet.HandleFunc("/", handlers.GetHandler).Methods("GET")
+	muxGet.HandleFunc("/", handlerStorage.GetHandler).Methods("GET")
 
 	go func() {
 		err = http.ListenAndServe(cfg.Port2, muxGet)

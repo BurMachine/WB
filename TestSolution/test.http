@@ -32,6 +32,6 @@ Content-Type: application/json
 
 ###
 
-GET localhost:8090/
+GET localhost:8090/?user_id=1234
 
 ###
