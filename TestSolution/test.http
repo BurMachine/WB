@@ -31,3 +31,7 @@ Content-Type: application/json
 }
 
 ###
+
+GET localhost:8090/
+
+###

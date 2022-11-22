@@ -32,11 +32,13 @@ func main() {
 	muxSet.HandleFunc("/", handlerStorage.SetHandler).Methods("POST")
 	muxGet.HandleFunc("/", handlers.GetHandler).Methods("GET")
 
+	go func() {
+		err = http.ListenAndServe(cfg.Port2, muxGet)
+		if err != nil {
+			log.Fatalln("error with server")
+		}
+	}()
 	err = http.ListenAndServe(cfg.Port1, muxSet)
-	if err != nil {
-		log.Fatalln("error with server")
-	}
-	err = http.ListenAndServe(cfg.Port2, muxGet)
 	if err != nil {
 		log.Fatalln("error with server")
 	}
