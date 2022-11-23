@@ -36,11 +36,20 @@ func main() {
 	handlerStorage := new(handlers.Storage)
 	handlerStorage.StorageH = storage
 
+	//Backup
+	err = storage.BackupLoad()
+	if err != nil {
+		log.Fatalln("Backup loading error")
+		return
+	}
+
 	muxSet := gorillaMux.NewRouter()
 	muxGet := gorillaMux.NewRouter()
 
 	muxSet.HandleFunc("/", authMiddleware.BasicAuth(handlerStorage.SetHandler)).Methods("POST")
 	muxGet.HandleFunc("/", handlerStorage.GetHandler).Methods("GET")
+	muxGet.HandleFunc("/backup/", handlerStorage.BackupHandler).Methods("GET")
+	muxSet.HandleFunc("/backup/", handlerStorage.BackupHandler).Methods("GET")
 
 	go func() {
 		err = http.ListenAndServe(cfg.Port2, muxGet)
