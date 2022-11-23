@@ -2,11 +2,11 @@ POST localhost:8080/
 Content-Type: application/json
 
 {
-  "user_id":"123",
-  "postpaid_limit":123,
-  "spp":123,
-  "shipping_fee":123,
-  "return_fee":123
+  "user_id":"user1",
+  "postpaid_limit":100,
+  "spp":40,
+  "shipping_fee":120,
+  "return_fee":125
 }
 
 ###
